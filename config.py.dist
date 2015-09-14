@@ -1,0 +1,17 @@
+app_key = "APP_KEY"
+app_secret = "APP_SECRET"
+
+# Example user to watch; generate this by running auth.py and following the directions.
+fluffy = {
+    'user_id': 993171,
+    'oauth_token': '993171-EXAMPLEEXAMPLEEXAMPLE',
+    'oauth_token_secret': 'EXAMPLEEXAMPLEEXAMPLE',
+}
+
+# Example bot to configure; generate this by running auth.py, and then add the 'learn_users' config
+fluff_ebooks = {
+    'user_id': 3544863320,
+    'oauth_token': '3544863320-EXAMPLEEXAMPLEEXAMPLE',
+    'oauth_token_secret': 'EXAMPLEEXAMPLEEXAMPLE',
+    'learn_users': [fluffy]
+}
