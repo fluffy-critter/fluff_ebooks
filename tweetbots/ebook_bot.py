@@ -1,6 +1,7 @@
 import markov
 import csv
 from twython import TwythonStreamer, Twython
+import logging
 
 class EbookBot(TwythonStreamer):
     def __init__(self, site_config, bot_config, interval=16*50):
@@ -48,18 +49,18 @@ class EbookBot(TwythonStreamer):
 
             for user in self.learn_users:
                 if tweet['user']['id'] == user['user_id']:
-                    print "%s says: %s" % (screen_name, tweet['text'])
+                    logging.info("%s says: %s" % (screen_name, tweet['text']))
                     self.markov.learn_tweet(tweet['text'])
 
             for mention in tweet['entities']['user_mentions']:
                 if mention['id'] == self.my_user_id:
                     response = '@%s ' % screen_name
-                    print "%s says: %s" % (screen_name,tweet['text'])
+                    logging.info("%s says: %s" % (screen_name,tweet['text']))
                     response += self.markov.generate_tweet(letters_left=140 - len(response))
-                    print "I will reply with: " + response
+                    logging.info("I will reply with: " + response)
                     self.post_client.update_status(status=response, in_reply_to_status_id=tweet['id'])
 
     def post_randomly(self):
         tweet = self.markov.generate_tweet()
-        print "Randomly posting: " + tweet
+        logging.info("Randomly posting: " + tweet)
         self.post_client.update_status(status=tweet)
