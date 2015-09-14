@@ -19,8 +19,7 @@ if __name__ == "__main__":
     def scheduled_posts():
         while True:
             time.sleep(15*60)
-            if now - last_post_time > datetime.timedelta(minutes=15):
-                bot.post_randomly()
+            bot.post_randomly()
     bg_thread = thread.start_new_thread(scheduled_posts, ())
 
     while True:
