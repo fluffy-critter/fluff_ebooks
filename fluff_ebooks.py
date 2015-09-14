@@ -8,22 +8,24 @@ import ssl
 import logging
 logging.basicConfig(filename='fluff_ebooks.log', level=logging.INFO)
 
-stream = ebb.EbookBot(config, config.fluff_ebooks)
+bot = ebb.EbookBot(config, config.fluff_ebooks)
 
 logging.debug("Loading training set...")
-count = stream.train_csv('fluffy.csv')
+count = bot.train_csv('fluffy.csv')
 logging.info("Learned %d tweets" % count)
 
 if __name__ == "__main__":
     last_post_time = datetime.datetime.now()
     while True:
         now = datetime.datetime.now()
-        if now - last_post_time > datetime.timedelta(seconds=15*60):
-            stream.post_randomly()
+        logging.info("Time since last post: %s", now - last_post_time)
+        if now - last_post_time > datetime.timedelta(minutes=15):
+            logging.info("Timeout exceeded; posting now")
+            bot.post_randomly()
             last_post_time = now
 
         try:
-            stream.user()
+            bot.user()
         except ssl.SSLError:
             pass
         except KeyboardInterrupt:
