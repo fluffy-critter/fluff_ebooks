@@ -14,8 +14,8 @@ twitter = Twython(config.app_key, config.app_secret, auth['oauth_token'], auth['
 tokens = twitter.get_authorized_tokens(pin)
 
 formatter = string.Formatter()
-print formatter.vformat('''{screen_name} = {
+print formatter.vformat('''{screen_name} = {{
     'user_id': {user_id},
     'oauth_token': '{oauth_token}',
     'oauth_token_secret': '{oauth_token_secret}'
-}''', [], tokens)
+}}''', [], tokens)
