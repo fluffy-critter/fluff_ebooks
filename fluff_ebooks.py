@@ -4,6 +4,8 @@ import tweetbots.ebook_bot as ebb
 import config
 
 stream = ebb.EbookBot(config, config.fluff_ebooks)
+
+print "Loading training set..."
 count = stream.train_csv('fluffy.csv')
 
 print "Learned %d tweets" % count
