@@ -2,15 +2,18 @@ import markov
 import csv
 from twython import TwythonStreamer, Twython
 import logging
+import HTMLParser
 
 class EbookBot(TwythonStreamer):
-    def __init__(self, site_config, bot_config, interval=16*50):
+    html = HTMLParser.HTMLParser()
+
+    def __init__(self, site_config, bot_config, timeout=30):
         super(EbookBot,self).__init__(
             site_config.app_key,
             site_config.app_secret,
             bot_config['oauth_token'],
             bot_config['oauth_token_secret'],
-            timeout=interval)
+            timeout=timeout)
 
         self.post_client = Twython(
             site_config.app_key,
@@ -24,6 +27,10 @@ class EbookBot(TwythonStreamer):
             self.learn_users = bot_config['learn_users']
         else:
             self.learn_users = []
+
+    def post(self, text, reply_id=None):
+        status = self.html.unescape(text)
+        self.post_client.update_status(status=text, in_reply_to_status_id=reply_id)
 
     def train_csv(self, filename):
         ''' Train from a Twitter archive CSV file. Returns the number of tweets learned. '''
@@ -49,18 +56,18 @@ class EbookBot(TwythonStreamer):
 
             for user in self.learn_users:
                 if tweet['user']['id'] == user['user_id']:
-                    logging.info("%s says: %s" % (screen_name, tweet['text']))
-                    self.markov.learn_tweet(tweet['text'])
+                    logging.info("Learning: <%s> %s" % (screen_name, tweet['text']))
+                    self.markov.learn_tweet(self.h.unescape(tweet['text']))
 
             for mention in tweet['entities']['user_mentions']:
                 if mention['id'] == self.my_user_id:
                     response = '@%s ' % screen_name
-                    logging.info("%s says: %s" % (screen_name,tweet['text']))
+                    logging.info("Replying: <%s> %s" % (screen_name,tweet['text']))
                     response += self.markov.generate_tweet(letters_left=140 - len(response))
-                    logging.info("I will reply with: " + response)
-                    self.post_client.update_status(status=response, in_reply_to_status_id=tweet['id'])
+                    logging.info("Response: " + response)
+                    self.post(response, reply_id=tweet['id'])
 
     def post_randomly(self):
         tweet = self.markov.generate_tweet()
         logging.info("Randomly posting: " + tweet)
-        self.post_client.update_status(status=tweet)
+        self.post(tweet)
