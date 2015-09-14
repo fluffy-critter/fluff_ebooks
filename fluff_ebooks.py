@@ -3,6 +3,7 @@
 import tweetbots.ebook_bot as ebb
 import config
 import datetime
+import ssl
 
 import logging
 logging.basicConfig(filename='fluff_ebooks.log', level=logging.INFO)
@@ -23,8 +24,7 @@ if __name__ == "__main__":
 
         try:
             stream.user()
+        except ssl.SSLError:
+            pass
         except KeyboardInterrupt:
             break
-        except:
-            pass
-

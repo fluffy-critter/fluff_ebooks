@@ -56,15 +56,16 @@ class EbookBot(TwythonStreamer):
 
             for user in self.learn_users:
                 if tweet['user']['id'] == user['user_id']:
-                    logging.info("Learning: <%s> %s" % (screen_name, tweet['text']))
-                    self.markov.learn_tweet(self.h.unescape(tweet['text']))
+                    logging.info("Learning: <%s> %s", screen_name, tweet['text'])
+                    self.markov.learn_tweet(tweet['text'])
 
             for mention in tweet['entities']['user_mentions']:
+                logging.info("Checking user_id %d %d", mention['id'], self.my_user_id)
                 if mention['id'] == self.my_user_id:
                     response = '@%s ' % screen_name
-                    logging.info("Replying: <%s> %s" % (screen_name,tweet['text']))
+                    logging.info("Replying: <%s> %s", screen_name,tweet['text'])
                     response += self.markov.generate_tweet(letters_left=140 - len(response))
-                    logging.info("Response: " + response)
+                    logging.info("Response: %s", response)
                     self.post(response, reply_id=tweet['id'])
 
     def post_randomly(self):
