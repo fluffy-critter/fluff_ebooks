@@ -7,7 +7,7 @@ Here's yet another one.
 ## Setup
 
 1. Clone this repo
-2. `virtualenv env`
+2. Run `./setup.sh`
 3. Create a new [Twitter application](http://apps.twitter.com)
 4. Copy `config.py.dist` to `config.py` and fill out the `app_key` and `app_secret` fields with your app's OAuth credentials
 
