@@ -26,3 +26,4 @@ Now you can create a bot; just copy `fluff_ebooks.py` to a new script and modify
 * Save the Markov chain training data out persistently
 * Do catch-up training at startup maybe?
 * More bot styles (e.g. @CleverGirlBot needs to finally exist)
+* More generic event-driven bot API
