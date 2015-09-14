@@ -4,7 +4,8 @@ import tweetbots.ebook_bot as ebb
 import config
 import datetime
 import ssl
-
+import thread
+import time
 import logging
 logging.basicConfig(filename='fluff_ebooks.log', level=logging.INFO)
 
@@ -15,18 +16,19 @@ count = bot.train_csv('fluffy.csv')
 logging.info("Learned %d tweets" % count)
 
 if __name__ == "__main__":
-    last_post_time = datetime.datetime.now()
-    while True:
-        now = datetime.datetime.now()
-        logging.info("Time since last post: %s", now - last_post_time)
-        if now - last_post_time > datetime.timedelta(minutes=15):
-            logging.info("Timeout exceeded; posting now")
-            bot.post_randomly()
-            last_post_time = now
+    def scheduled_posts():
+        while True:
+            time.sleep(15*60)
+            if now - last_post_time > datetime.timedelta(minutes=15):
+                bot.post_randomly()
+    bg_thread = thread.start_new_thread(scheduled_posts, ())
 
+    while True:
         try:
             bot.user()
         except ssl.SSLError:
             pass
         except KeyboardInterrupt:
             break
+
+    bg_thread.exit()
