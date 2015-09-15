@@ -18,8 +18,11 @@ logging.info("Learned %d tweets" % count)
 if __name__ == "__main__":
     def scheduled_posts():
         while True:
-            time.sleep(15*60)
-            bot.post_randomly()
+            try:
+                time.sleep(15*60)
+                bot.post_randomly()
+            except:
+                pass
     bg_thread = thread.start_new_thread(scheduled_posts, ())
 
     while True:
