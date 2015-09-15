@@ -9,13 +9,9 @@ class MarkovChain:
 
     def learn_word(self, cur, word, weight=1):
         ''' Learn a word for the markov chain '''
-        if not cur in self.tokens:
-            self.tokens[cur] = { "total": 0, "next": {}}
-        node = self.tokens[cur]
+        node = self.tokens.setdefault(cur, { "total": 0, "next": {} })
         node["total"] += weight
-        if not word in node["next"]:
-            node["next"][word] = 0
-        node["next"][word] += weight
+        node["next"][word] = node["next"].get(word, 0) + weight
 
     def learn_tweet(self, tweet_text):
         ''' Learn a sentence from a tweet. Strips out all @mentions. '''
