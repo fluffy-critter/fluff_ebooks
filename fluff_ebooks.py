@@ -19,7 +19,7 @@ if __name__ == "__main__":
     def scheduled_posts():
         while True:
             try:
-                time.sleep(15*60)
+                time.sleep(3600)
                 bot.post_randomly()
             except:
                 pass
