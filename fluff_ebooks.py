@@ -33,4 +33,3 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
 
-    bg_thread.exit()
