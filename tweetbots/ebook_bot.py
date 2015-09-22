@@ -44,14 +44,16 @@ class EbookBot(TwythonStreamer):
                 cur_id += 1
 
             text_col = col_ids["text"]
+            rt_col = col_ids["retweeted_status_id"]
             count = 0
             for row in reader:
-                self.markov.learn_tweet(row[text_col])
-                count += 1
+                if row[text_col] and not row[rt_col]:
+                    self.markov.learn_tweet(row[text_col])
+                    count += 1
         return count
 
     def on_success(self, tweet):
-        if 'text' in tweet:
+        if 'text' in tweet and not 'retweeted_status_id' in tweet:
             screen_name = tweet['user']['screen_name']
 
             for user in self.learn_users:
