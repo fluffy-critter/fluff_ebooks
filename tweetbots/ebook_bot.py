@@ -53,7 +53,8 @@ class EbookBot(TwythonStreamer):
         return count
 
     def on_success(self, tweet):
-        if 'text' in tweet and not 'retweeted_status_id' in tweet:
+        logging.debug(repr(tweet))
+        if 'text' in tweet and not 'retweeted_status' in tweet:
             screen_name = tweet['user']['screen_name']
 
             for user in self.learn_users:
