@@ -67,7 +67,7 @@ class EbookBot(TwythonStreamer):
                 if mention['id'] == self.my_user_id:
                     response = '@%s ' % screen_name
                     logging.info("Replying: <%s> %s", screen_name,tweet['text'])
-                    response += self.markov.generate_tweet(letters_left=140 - len(response))
+                    response += self.markov.generate_tweet(size=140 - len(response))
                     logging.info("Response: %s", response)
                     self.post(response, reply_id=tweet['id'])
 
