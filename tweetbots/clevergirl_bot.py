@@ -42,7 +42,7 @@ class CleverGirlBot(TwythonStreamer):
                 logging.info("Replying: <%s> %s", screen_name,tweet['text'])
                 response += self.generate_tweet()
                 logging.info("Response: %s", response)
-                self.post_client.update_status(status=response, reply_id=tweet['id'])
+                self.post_client.update_status(status=response, in_reply_to_status_id=tweet['id'])
 
     def generate_tweet(self):
         rawr = 'R' + 'a'*random.randint(0,5) + 'w'*random.randint(0,4) + 'r'*random.randint(1,3)
