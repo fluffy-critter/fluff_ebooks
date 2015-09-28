@@ -7,13 +7,17 @@ import ssl
 import thread
 import time
 import logging
-logging.basicConfig(filename='fluff_ebooks.log', level=logging.INFO)
+import sys
+
+logging.basicConfig(level=logging.INFO)
 
 bot = ebb.EbookBot(config, config.fluff_ebooks)
 
-logging.debug("Loading training set...")
-count = bot.train_csv('fluffy.csv')
-logging.info("Learned %d tweets" % count)
+for csv in sys.argv[1:]:
+    logging.info("Training from %s", csv)
+    count = bot.train_csv(csv)
+    logging.info("Learned %d tweets" % count)
+bot.flush()
 
 if __name__ == "__main__":
     def scheduled_posts():

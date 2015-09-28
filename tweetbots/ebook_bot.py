@@ -3,6 +3,7 @@ import csv
 from twython import TwythonStreamer, Twython
 import logging
 import HTMLParser
+import os
 
 class EbookBot(TwythonStreamer):
     html = HTMLParser.HTMLParser()
@@ -22,11 +23,24 @@ class EbookBot(TwythonStreamer):
             bot_config['oauth_token_secret'])
 
         self.markov = markov.MarkovChain()
+
         self.my_user_id = bot_config['user_id']
         if 'learn_users' in bot_config:
             self.learn_users = bot_config['learn_users']
         else:
             self.learn_users = []
+
+        self.corpus_file = bot_config.get('corpus_file', None)
+        if self.corpus_file and os.path.isfile(self.corpus_file):
+            logging.info("Reading corpus file %s", self.corpus_file)
+            with open(self.corpus_file, 'r') as file:
+                self.markov.load_corpus(file.read())
+            logging.info("Done")
+
+    def flush(self):
+        if self.corpus_file:
+            with open(self.corpus_file, 'w') as file:
+                file.write(self.markov.get_corpus())
 
     def post(self, text, reply_id=None):
         status = self.html.unescape(text)
@@ -61,6 +75,7 @@ class EbookBot(TwythonStreamer):
                 if tweet['user']['id'] == user['user_id']:
                     logging.info("Learning: <%s> %s", screen_name, tweet['text'])
                     self.markov.learn_tweet(tweet['text'])
+                    self.flush()
 
             for mention in tweet['entities']['user_mentions']:
                 logging.info("Checking user_id %d %d", mention['id'], self.my_user_id)
