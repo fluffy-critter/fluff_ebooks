@@ -9,7 +9,7 @@ import time
 import logging
 import sys
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename="fluff_ebooks.log",level=logging.INFO)
 
 bot = ebb.EbookBot(config, config.fluff_ebooks)
 

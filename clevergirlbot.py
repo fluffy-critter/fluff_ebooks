@@ -10,7 +10,7 @@ import logging
 import sys
 import random
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename="clevergirlbot.log",level=logging.INFO)
 
 bot = cgb.CleverGirlBot(config, config.clevergirlbot)
 
