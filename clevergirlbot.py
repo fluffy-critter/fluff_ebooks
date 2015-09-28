@@ -17,7 +17,7 @@ bot = cgb.CleverGirlBot(config, config.clevergirlbot)
 if __name__ == "__main__":
     while True:
         try:
-            bot.user(track='clever girl')
+            bot.run()
         except ssl.SSLError:
             pass
         except KeyboardInterrupt:

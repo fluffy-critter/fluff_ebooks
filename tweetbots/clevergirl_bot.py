@@ -28,12 +28,13 @@ class CleverGirlBot(TwythonStreamer):
             respond = False
 
             for mention in tweet['entities']['user_mentions']:
-                logging.info("Checking user_id %d %d", mention['id'], self.my_user_id)
                 if mention['id'] == self.my_user_id:
+                    logging.info("Mentioned")
                     respond = True
 
             for term in self.respond_to:
                 if term.lower() in tweet['text'].lower():
+                    logging.info("Matched phrase %s", term)
                     respond = True
 
             if respond:
@@ -44,7 +45,7 @@ class CleverGirlBot(TwythonStreamer):
                 self.post_client.update_status(status=response, reply_id=tweet['id'])
 
     def generate_tweet(self):
-        rawr = 'R' + 'a'*random.randint(0,5) + 'w'*random.randint(0,3) + 'r'*random.randint(1,3)
+        rawr = 'R' + 'a'*random.randint(0,5) + 'w'*random.randint(0,4) + 'r'*random.randint(1,3)
 
         rawr += random.choice(['', '...', '.', '...?', '!'])
         rawr = random.choice([
@@ -57,3 +58,6 @@ class CleverGirlBot(TwythonStreamer):
         rawr += random.choice(['', '', '', '', ' :>', ' *nuzzles*', ' *playfully nips*'])
 
         return rawr
+
+    def run(self):
+        self.user(track=','.join(self.respond_to))
