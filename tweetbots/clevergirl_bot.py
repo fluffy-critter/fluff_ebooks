@@ -1,8 +1,16 @@
-from twython import TwythonStreamer, Twython
+from twython import TwythonStreamer, Twython, TwythonError
 import logging
 import random
+import datetime
+import Queue
+import time
+import thread
+from collections import namedtuple
+
+QueueItem = namedtuple("QueueItem", "when text reply_id")
 
 class CleverGirlBot(TwythonStreamer):
+
     def __init__(self, site_config, bot_config, timeout=30):
         super(CleverGirlBot,self).__init__(
             site_config.app_key,
@@ -19,6 +27,10 @@ class CleverGirlBot(TwythonStreamer):
 
         self.my_user_id = bot_config['user_id']
         self.respond_to = bot_config.get('respond_to', [])
+        self.post_queue = Queue.Queue()
+
+        self.thread_id = thread.start_new_thread(self.worker_task, ())
+        logging.info("Worker thread: %d", self.thread_id)
 
     def on_success(self, tweet):
         logging.debug(repr(tweet))
@@ -42,7 +54,24 @@ class CleverGirlBot(TwythonStreamer):
                 logging.info("Replying: <%s> %s", screen_name,tweet['text'])
                 response += self.generate_tweet()
                 logging.info("Response: %s", response)
-                self.post_client.update_status(status=response, in_reply_to_status_id=tweet['id'])
+                self.post(response, tweet['id'])
+
+    def post(self, response, reply_id):
+        self.post_queue.put(QueueItem(datetime.datetime.now() + datetime.timedelta(seconds=10), response, reply_id))
+
+    def worker_task(self):
+        while True:
+            tweet = self.post_queue.get()
+            wait_time = (tweet.when - datetime.datetime.now()).seconds
+            if wait_time > 0:
+                time.sleep(wait_time)
+
+            logging.info("Worker posting tweet [%s](in reply to %s)", tweet.text, tweet.reply_id)
+            try:
+                self.post_client.update_status(status=tweet.text, in_reply_to_status_id=tweet.reply_id)
+            except TwythonError, e:
+                logging.info("Post failed: %s", e)
+                # self.post_queue.put(tweet)
 
     def generate_tweet(self):
         rawr = 'R' + 'a'*random.randint(0,5) + 'w'*random.randint(0,4) + 'r'*random.randint(1,3)
