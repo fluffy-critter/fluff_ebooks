@@ -39,14 +39,16 @@ class EbookBot(TwythonStreamer):
 
     def flush(self):
         if self.corpus_file:
+            logging.info("Flushing corpus to %s", self.corpus_file)
             with open(self.corpus_file, 'w') as file:
                 file.write(self.markov.get_corpus())
+            logging.info("Done")
 
     def post(self, text, reply_id=None):
         status = self.html.unescape(text)
         self.post_client.update_status(status=text, in_reply_to_status_id=reply_id)
 
-    def train_csv(self, filename):
+    def train_csv(self, filename, text_filter=None):
         ''' Train from a Twitter archive CSV file. Returns the number of tweets learned. '''
         with open(filename, 'r') as tweetfile:
             reader = csv.reader(tweetfile)
@@ -62,9 +64,18 @@ class EbookBot(TwythonStreamer):
             count = 0
             for row in reader:
                 if row[text_col] and not row[rt_col]:
-                    self.markov.learn_tweet(row[text_col])
+                    text = row[text_col]
+                    if text_filter:
+                        text = text_filter(text)
+                    self.markov.learn_tweet(text)
                     count += 1
         return count
+
+    def train_text(self, filename):
+        ''' Train from a plain ol' text file. '''
+        with open(filename, 'r') as textfile:
+            for line in textfile:
+                self.markov.learn_tweet(line)
 
     def on_success(self, tweet):
         logging.debug(repr(tweet))
